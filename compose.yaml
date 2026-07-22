@@ -1,0 +1,27 @@
+name: rg-roadmap
+
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: rg-roadmap-database
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: rgroadmap
+      POSTGRES_PASSWORD: rgroadmap_dev_password
+      POSTGRES_DB: rg_roadmap
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - rg_roadmap_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rgroadmap -d rg_roadmap"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  rg_roadmap_postgres_data:
