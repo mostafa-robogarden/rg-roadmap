@@ -1,1 +1,17 @@
-<p>profile-page works!</p>
+<section *ngIf="user$ | async as user" class="profile-layout">
+  <div class="card profile-card">
+    <div class="avatar">{{ user.name.charAt(0) }}</div>
+    <div>
+      <p class="eyebrow">{{ user.role }}</p>
+      <h1>{{ user.name }}</h1>
+      <p class="muted">{{ user.email }}</p>
+    </div>
+  </div>
+
+  <div class="card stack">
+    <h2>Account capabilities</h2>
+    <p>You can save generated roadmaps, mark milestones complete, and return to your dashboard at any time.</p>
+    <a class="button button-primary" routerLink="/">Open my dashboard</a>
+    <a *ngIf="user.role === 'ADMIN'" class="button button-secondary" routerLink="/admin/tracks">Open content admin</a>
+  </div>
+</section>

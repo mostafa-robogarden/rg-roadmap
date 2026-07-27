@@ -1,1 +1,15 @@
-<p>questions-admin-page works!</p>
+<nav class="admin-nav"><a routerLink="/admin/tracks" routerLinkActive="active">Tracks</a><a routerLink="/admin/questions" routerLinkActive="active">Questions</a><a routerLink="/admin/templates" routerLinkActive="active">Templates</a><a routerLink="/admin/analytics" routerLinkActive="active">Analytics</a></nav>
+<div class="page-header"><div><p class="eyebrow">Content administration</p><h1>Assessment questions</h1><p class="lead">Each option is scored from 0 to 3 in the order shown.</p></div></div>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+<section class="admin-layout">
+<form class="card stack" [formGroup]="form" (ngSubmit)="save()">
+<h2>{{ editingId ? 'Edit question' : 'Add question' }}</h2>
+<div class="form-field"><label>Track</label><select formControlName="trackId"><option value="">All tracks</option><option *ngFor="let track of tracks" [value]="track.id">{{ track.title }}</option></select></div>
+<div class="form-field"><label>Question</label><textarea formControlName="prompt"></textarea></div>
+<div class="form-field"><label>Order</label><input type="number" min="1" formControlName="sortOrder"></div>
+<div class="form-field"><label>Option 1 · score 0</label><input formControlName="option1"></div><div class="form-field"><label>Option 2 · score 1</label><input formControlName="option2"></div><div class="form-field"><label>Option 3 · score 2</label><input formControlName="option3"></div><div class="form-field"><label>Option 4 · score 3</label><input formControlName="option4"></div>
+<label><input type="checkbox" formControlName="isActive"> Active</label>
+<div class="inline-actions"><button class="button button-primary">Save</button><button *ngIf="editingId" type="button" class="button button-ghost" (click)="cancel()">Cancel</button></div>
+</form>
+<div class="stack"><article *ngFor="let question of questions" class="card"><div class="question-head"><span class="badge">#{{ question.sortOrder }}</span><span class="muted">{{ question.track?.title ?? 'All tracks' }}</span></div><h3>{{ question.prompt }}</h3><ol><li *ngFor="let option of question.options">{{ option.label }} <small>({{ option.score }})</small></li></ol><div class="inline-actions"><button class="button button-ghost button-small" (click)="edit(question)">Edit</button><button class="button button-danger button-small" (click)="remove(question)">Delete/archive</button></div></article></div>
+</section>

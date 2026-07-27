@@ -1,1 +1,7 @@
-<p>analytics-admin-page works!</p>
+<nav class="admin-nav"><a routerLink="/admin/tracks" routerLinkActive="active">Tracks</a><a routerLink="/admin/questions" routerLinkActive="active">Questions</a><a routerLink="/admin/templates" routerLinkActive="active">Templates</a><a routerLink="/admin/analytics" routerLinkActive="active">Analytics</a></nav>
+<div class="page-header"><div><p class="eyebrow">Funnel analytics</p><h1>Product metrics</h1><p class="lead">A lightweight view of assessment completion, generation, saves, and learner progress.</p></div></div>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+<ng-container *ngIf="summary">
+<section class="metric-grid"><article class="card"><span>Learners</span><strong>{{ summary.users }}</strong></article><article class="card"><span>Published tracks</span><strong>{{ summary.publishedTracks }}</strong></article><article class="card"><span>Quiz starts</span><strong>{{ summary.quizStarted }}</strong></article><article class="card"><span>Quiz completion</span><strong>{{ summary.quizCompletionRate }}%</strong></article><article class="card"><span>Roadmaps generated</span><strong>{{ summary.roadmapGenerated }}</strong></article><article class="card"><span>Roadmaps saved</span><strong>{{ summary.roadmapsSaved }}</strong></article><article class="card"><span>Milestones completed</span><strong>{{ summary.milestonesCompleted }}</strong></article></section>
+<section class="card table-wrap"><h2>Captured events</h2><table><thead><tr><th>Event</th><th>Count</th></tr></thead><tbody><tr *ngFor="let event of events"><td>{{ event.eventName }}</td><td>{{ event.count }}</td></tr></tbody></table></section>
+</ng-container>

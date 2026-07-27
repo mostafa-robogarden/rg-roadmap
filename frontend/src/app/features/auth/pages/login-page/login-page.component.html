@@ -1,1 +1,28 @@
-<p>login-page works!</p>
+<section class="auth-layout">
+  <div class="auth-copy">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Continue building your future.</h1>
+    <p class="lead">Log in to save roadmaps and track milestone progress.</p>
+    <div class="demo-card card">
+      <strong>Demo learner account</strong>
+      <code>learner&#64;rgroadmap.local</code>
+      <code>Roadmap123!</code>
+    </div>
+  </div>
+
+  <form class="card auth-form stack" [formGroup]="form" (ngSubmit)="submit()">
+    <h2>Log in</h2>
+    <div *ngIf="error" class="error-banner">{{ error }}</div>
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" formControlName="email">
+      <small *ngIf="form.controls.email.touched && form.controls.email.invalid" class="error-text">Enter a valid email address.</small>
+    </div>
+    <div class="form-field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" formControlName="password">
+    </div>
+    <button class="button button-primary" type="submit" [disabled]="submitting">{{ submitting ? 'Logging in…' : 'Log in' }}</button>
+    <p class="muted">No account yet? <a routerLink="/register" [queryParams]="{returnUrl: returnUrl}">Create one</a>.</p>
+  </form>
+</section>

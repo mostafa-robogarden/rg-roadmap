@@ -1,1 +1,66 @@
-<p>home-page works!</p>
+<section class="hero">
+  <div>
+    <p class="eyebrow">Personalized, practical, achievable</p>
+    <h1>Turn a career goal into your next clear step.</h1>
+    <p class="lead">Choose a track, answer a short assessment, and receive a curated roadmap matched to your current level.</p>
+    <div class="inline-actions">
+      <a class="button button-primary" href="#tracks">Explore tracks</a>
+      <a *ngIf="!auth.isAuthenticated" class="button button-ghost" routerLink="/register">Create a free account</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="node node-one">Goal</div>
+    <div class="path"></div>
+    <div class="node node-two">Skills</div>
+    <div class="path"></div>
+    <div class="node node-three">Career</div>
+  </div>
+</section>
+
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+<p *ngIf="loading" class="muted">Loading roadmaps…</p>
+
+<section *ngIf="auth.isAuthenticated" class="saved-section">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Your dashboard</p>
+      <h2>Saved roadmaps</h2>
+    </div>
+    <a routerLink="/profile">View profile</a>
+  </div>
+
+  <div *ngIf="roadmaps.length; else noRoadmaps" class="card-grid">
+    <article *ngFor="let roadmap of roadmaps" class="card roadmap-card">
+      <span class="badge">{{ roadmap.level }}</span>
+      <h3>{{ roadmap.title }}</h3>
+      <p class="muted">{{ roadmap.track.title }}</p>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" [style.width.%]="progress(roadmap)"></div></div>
+        <strong>{{ progress(roadmap) }}%</strong>
+      </div>
+      <a class="button button-secondary" [routerLink]="['/roadmaps', roadmap.id]">Continue roadmap</a>
+    </article>
+  </div>
+  <ng-template #noRoadmaps><div class="card empty-state">You have not saved a roadmap yet. Pick a track below to begin.</div></ng-template>
+</section>
+
+<section id="tracks">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Roadmap catalog</p>
+      <h2>Choose your direction</h2>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <article *ngFor="let track of tracks" class="card track-card">
+      <div class="track-card-top">
+        <span class="badge">{{ track.category }}</span>
+        <span *ngIf="track.isTrending" class="trending">Trending</span>
+      </div>
+      <h3>{{ track.title }}</h3>
+      <p>{{ track.description }}</p>
+      <a class="button button-primary" [routerLink]="['/tracks', track.slug]">View track</a>
+    </article>
+  </div>
+</section>

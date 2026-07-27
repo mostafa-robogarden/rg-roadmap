@@ -1,0 +1,5 @@
+.admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; padding: .75rem; border-radius: 14px; background: #eaf4f2; overflow-x: auto; }
+.admin-nav a { padding: .55rem .8rem; text-decoration: none; font-weight: 750; white-space: nowrap; }
+.admin-nav a.active { border-radius: 9px; background: white; }
+.admin-layout { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 1rem; align-items: start; }
+@media(max-width:900px){.admin-layout{grid-template-columns:1fr;}}

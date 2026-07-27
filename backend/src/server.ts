@@ -1,48 +1,142 @@
-import "dotenv/config";
-
 import cors from "cors";
-import express, {
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import express from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import helmet from "helmet";
+import pg from "pg";
 
+import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
+
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middleware/error-handler.js";
+
+import { sessionContext } from "./utils/session.js";
+
+import { adminRouter } from "./modules/admin/admin.routes.js";
+import { analyticsRouter } from "./modules/analytics/analytics.routes.js";
+import { assessmentRouter } from "./modules/assessments/assessment.routes.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
+import { catalogRouter } from "./modules/catalog/catalog.routes.js";
+import { roadmapRouter } from "./modules/roadmaps/roadmap.routes.js";
 
 const app = express();
 
-const port = Number(process.env.PORT ?? 4001);
-const appName = process.env.APP_NAME ?? "RG Connect API";
+const PgStore =
+  connectPgSimple(session);
 
-app.use(cors());
-app.use(express.json());
-
-app.get("/api/health", async (_request: Request, response: Response) => {
-  await prisma.$queryRaw`SELECT 1`;
-
-  response.status(200).json({
-    status: "ok",
-    application: appName,
-    database: "connected",
-    timestamp: new Date().toISOString(),
-  });
+const pool = new pg.Pool({
+  connectionString: env.DATABASE_URL,
 });
 
-app.use(
-  (
-    error: unknown,
-    _request: Request,
-    response: Response,
-    _next: NextFunction,
-  ) => {
-    console.error(error);
+app.disable("x-powered-by");
 
-    response.status(500).json({
-      message: "An unexpected server error occurred.",
+if (env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: env.FRONTEND_ORIGIN,
+    credentials: true,
+  }),
+);
+
+app.use(
+  express.json({
+    limit: "100kb",
+  }),
+);
+
+app.use(
+  session({
+    name: "rg_roadmap.sid",
+    secret: env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+
+    store: new PgStore({
+      pool,
+      tableName: "session",
+      createTableIfMissing: false,
+    }),
+
+    cookie: {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge:
+        env.SESSION_TTL_DAYS *
+        24 *
+        60 *
+        60 *
+        1000,
+    },
+  }),
+);
+
+app.use(sessionContext);
+
+app.get(
+  "/api/health",
+  async (_request, response) => {
+    await prisma.$queryRaw`SELECT 1`;
+
+    response.json({
+      status: "ok",
+      application: env.APP_NAME,
+      database: "connected",
+      timestamp: new Date().toISOString(),
     });
   },
 );
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`${appName} is running on http://localhost:${port}`);
+app.use("/api/auth", authRouter);
+app.use("/api/tracks", catalogRouter);
+app.use("/api/assessments", assessmentRouter);
+app.use("/api/roadmaps", roadmapRouter);
+app.use("/api/events", analyticsRouter);
+app.use("/api/admin", adminRouter);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+const server = app.listen(
+  env.PORT,
+  "0.0.0.0",
+  () => {
+    console.log(
+      `${env.APP_NAME} is running on http://localhost:${env.PORT}`,
+    );
+  },
+);
+
+async function shutdown(
+  signal: string,
+): Promise<void> {
+  console.log(
+    `Received ${signal}. Shutting down...`,
+  );
+
+  server.close(async () => {
+    await Promise.all([
+      prisma.$disconnect(),
+      pool.end(),
+    ]);
+
+    process.exit(0);
+  });
+}
+
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
 });

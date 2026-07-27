@@ -1,1 +1,42 @@
-<p>saved-roadmap-page works!</p>
+<a routerLink="/">← Back to dashboard</a>
+<p *ngIf="loading" class="muted">Loading saved roadmap…</p>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+
+<section *ngIf="roadmap" class="saved-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">{{ roadmap.track.title }} · {{ roadmap.level }}</p>
+      <h1>{{ roadmap.title }}</h1>
+      <p class="lead">Mark milestones complete as you work through the path.</p>
+    </div>
+    <button class="button button-danger" type="button" (click)="remove()">Delete roadmap</button>
+  </div>
+
+  <div class="progress-card card">
+    <div><strong>{{ progress }}% complete</strong><span>{{ roadmap.milestones.length }} milestones</span></div>
+    <div class="progress-track"><div class="progress-fill" [style.width.%]="progress"></div></div>
+  </div>
+
+  <div class="milestone-list">
+    <article *ngFor="let milestone of roadmap.milestones" class="card milestone" [class.complete]="milestone.completedAt">
+      <button
+        class="check-button"
+        type="button"
+        [disabled]="updating.has(milestone.id)"
+        [attr.aria-label]="milestone.completedAt ? 'Mark milestone incomplete' : 'Mark milestone complete'"
+        (click)="toggle(milestone)">
+        {{ milestone.completedAt ? '✓' : milestone.sortOrder }}
+      </button>
+      <div>
+        <div class="milestone-heading">
+          <h2>{{ milestone.title }}</h2>
+          <span *ngIf="milestone.estimatedHours" class="badge">~{{ milestone.estimatedHours }} hours</span>
+        </div>
+        <p>{{ milestone.description }}</p>
+        <div class="resource-list">
+          <a *ngFor="let resource of milestone.resources" [href]="resource.url" target="_blank" rel="noopener">{{ resource.label }} ↗</a>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

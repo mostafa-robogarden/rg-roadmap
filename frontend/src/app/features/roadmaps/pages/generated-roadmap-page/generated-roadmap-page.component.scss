@@ -1,0 +1,7 @@
+.roadmap-line { position: relative; display: grid; gap: 1.2rem; max-width: 900px; margin: 0 auto; }
+.roadmap-line::before { content: ''; position: absolute; left: 31px; top: 30px; bottom: 30px; width: 3px; background: linear-gradient(var(--primary), var(--accent)); }
+.milestone { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 1rem; padding: 1.5rem; }
+.milestone-number { position: relative; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; font-weight: 850; }
+.milestone-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.resource-list { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+.resource-list a { font-weight: 700; }

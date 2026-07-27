@@ -1,0 +1,5 @@
+.profile-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 900px; margin: 2rem auto; }
+.profile-card { display: flex; align-items: center; gap: 1.25rem; }
+.avatar { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 22px; background: var(--primary); color: white; font-size: 2rem; font-weight: 850; }
+.profile-card h1 { margin-bottom: .25rem; }
+@media (max-width: 700px) { .profile-layout { grid-template-columns: 1fr; } }

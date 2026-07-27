@@ -1,1 +1,26 @@
-<p>tracks-admin-page works!</p>
+<nav class="admin-nav">
+  <a routerLink="/admin/tracks" routerLinkActive="active">Tracks</a>
+  <a routerLink="/admin/questions" routerLinkActive="active">Questions</a>
+  <a routerLink="/admin/templates" routerLinkActive="active">Templates</a>
+  <a routerLink="/admin/analytics" routerLinkActive="active">Analytics</a>
+</nav>
+<div class="page-header"><div><p class="eyebrow">Content administration</p><h1>Roadmap tracks</h1></div></div>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+<div *ngIf="message" class="success-banner">{{ message }}</div>
+<section class="admin-layout">
+  <form class="card stack" [formGroup]="form" (ngSubmit)="save()">
+    <h2>{{ editingId ? 'Edit track' : 'Add track' }}</h2>
+    <div class="form-field"><label>Slug</label><input formControlName="slug" placeholder="data-engineering"></div>
+    <div class="form-field"><label>Title</label><input formControlName="title"></div>
+    <div class="form-field"><label>Category</label><input formControlName="category"></div>
+    <div class="form-field"><label>Description</label><textarea formControlName="description"></textarea></div>
+    <label><input type="checkbox" formControlName="isTrending"> Trending</label>
+    <label><input type="checkbox" formControlName="isPublished"> Published</label>
+    <div class="inline-actions"><button class="button button-primary" type="submit">Save</button><button *ngIf="editingId" class="button button-ghost" type="button" (click)="cancel()">Cancel</button></div>
+  </form>
+  <div class="card table-wrap">
+    <table><thead><tr><th>Track</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody><tr *ngFor="let track of tracks"><td><strong>{{ track.title }}</strong><br><small>{{ track.slug }}</small></td><td>{{ track.category }}</td><td>{{ track.isPublished ? 'Published' : 'Hidden' }}</td><td><div class="inline-actions"><button class="button button-ghost button-small" (click)="edit(track)">Edit</button><button class="button button-danger button-small" (click)="remove(track)">Delete</button></div></td></tr></tbody>
+    </table>
+  </div>
+</section>

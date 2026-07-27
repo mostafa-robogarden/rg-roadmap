@@ -1,1 +1,16 @@
-<p>templates-admin-page works!</p>
+<nav class="admin-nav"><a routerLink="/admin/tracks" routerLinkActive="active">Tracks</a><a routerLink="/admin/questions" routerLinkActive="active">Questions</a><a routerLink="/admin/templates" routerLinkActive="active">Templates</a><a routerLink="/admin/analytics" routerLinkActive="active">Analytics</a></nav>
+<div class="page-header"><div><p class="eyebrow">Content administration</p><h1>Roadmap templates</h1><p class="lead">Maintain the deterministic milestone content used by the generator.</p></div></div>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+<section class="admin-layout">
+<form class="card stack" [formGroup]="form" (ngSubmit)="save()">
+<h2>{{ editingId ? 'Edit template' : 'Add template' }}</h2>
+<div class="form-field"><label>Track</label><select formControlName="trackId"><option value="">Select track</option><option *ngFor="let track of tracks" [value]="track.id">{{ track.title }}</option></select></div>
+<div class="form-field"><label>Level</label><select formControlName="level"><option *ngFor="let level of levels" [value]="level">{{ level }}</option></select></div>
+<div class="form-field"><label>Title</label><input formControlName="title"></div>
+<div class="form-field"><label>Description</label><textarea formControlName="description"></textarea></div>
+<div class="form-field"><label>Milestones</label><textarea rows="12" formControlName="milestonesText" placeholder="Title | Description | Hours | Resource label | https://resource.url"></textarea><small class="muted">One milestone per line. Resource columns are optional.</small></div>
+<label><input type="checkbox" formControlName="isActive"> Active</label>
+<div class="inline-actions"><button class="button button-primary">Save</button><button *ngIf="editingId" type="button" class="button button-ghost" (click)="cancel()">Cancel</button></div>
+</form>
+<div class="stack"><article *ngFor="let template of templates" class="card"><div class="template-head"><span class="badge">{{ template.level }}</span><span class="muted">{{ template.track.title }}</span></div><h3>{{ template.title }}</h3><p>{{ template.description }}</p><p class="muted">{{ template.milestones.length }} milestones · {{ template.isActive ? 'Active' : 'Archived' }}</p><div class="inline-actions"><button class="button button-ghost button-small" (click)="edit(template)">Edit</button><button class="button button-danger button-small" (click)="remove(template)">Delete/archive</button></div></article></div>
+</section>

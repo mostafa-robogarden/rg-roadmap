@@ -1,0 +1,16 @@
+.hero { display: grid; grid-template-columns: 1.25fr .75fr; gap: 3rem; align-items: center; min-height: 430px; margin-bottom: 3rem; padding: clamp(1.5rem, 5vw, 4rem); border-radius: 28px; background: linear-gradient(135deg, #e7f5f2, #fff6df); overflow: hidden; }
+.hero h1 { max-width: 760px; font-size: clamp(2.5rem, 6vw, 5rem); letter-spacing: -.045em; }
+.hero-visual { display: grid; justify-items: center; }
+.node { width: 130px; padding: 1rem; text-align: center; border-radius: 16px; background: white; box-shadow: var(--shadow); font-weight: 850; }
+.node-two { transform: translateX(-48px); background: var(--primary); color: white; }
+.node-three { transform: translateX(35px); }
+.path { width: 4px; height: 58px; background: linear-gradient(var(--primary), var(--accent)); }
+.saved-section { margin-bottom: 3rem; }
+.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin: 2.5rem 0 1rem; }
+.section-heading h2 { margin-bottom: 0; font-size: 2rem; }
+.track-card, .roadmap-card { display: flex; flex-direction: column; align-items: flex-start; }
+.track-card p, .roadmap-card p { flex: 1; }
+.track-card-top { width: 100%; display: flex; justify-content: space-between; gap: .5rem; }
+.trending { color: #9a5b00; font-size: .78rem; font-weight: 850; }
+.progress-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .75rem; width: 100%; margin: 1rem 0; }
+@media (max-width: 780px) { .hero { grid-template-columns: 1fr; } .hero-visual { display: none; } }

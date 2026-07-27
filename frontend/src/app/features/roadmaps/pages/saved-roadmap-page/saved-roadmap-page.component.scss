@@ -1,0 +1,10 @@
+.progress-card { margin-bottom: 1.2rem; }
+.progress-card > div:first-child { display: flex; justify-content: space-between; margin-bottom: .75rem; }
+.milestone-list { display: grid; gap: 1rem; }
+.milestone { display: grid; grid-template-columns: 48px 1fr; gap: 1rem; transition: opacity .15s ease; }
+.milestone.complete { opacity: .68; background: #f0f8f5; }
+.milestone.complete h2 { text-decoration: line-through; }
+.check-button { width: 42px; height: 42px; border: 2px solid var(--primary); border-radius: 50%; background: white; color: var(--primary); font-weight: 850; cursor: pointer; }
+.complete .check-button { background: var(--primary); color: white; }
+.milestone-heading { display: flex; justify-content: space-between; gap: 1rem; }
+.resource-list { display: flex; flex-wrap: wrap; gap: .75rem; }

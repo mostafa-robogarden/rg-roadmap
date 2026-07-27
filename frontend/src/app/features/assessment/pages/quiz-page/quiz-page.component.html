@@ -1,1 +1,38 @@
-<p>quiz-page works!</p>
+<section class="quiz-shell">
+  <p *ngIf="loading" class="muted">Loading assessment…</p>
+  <div *ngIf="error" class="error-banner">{{ error }}</div>
+
+  <ng-container *ngIf="assessment && currentQuestion as question">
+    <div class="quiz-header">
+      <div>
+        <p class="eyebrow">{{ assessment.track.title }}</p>
+        <h1>Question {{ currentIndex + 1 }} of {{ questions.length }}</h1>
+      </div>
+      <strong>{{ progress }}%</strong>
+    </div>
+    <div class="progress-track"><div class="progress-fill" [style.width.%]="progress"></div></div>
+
+    <article class="card question-card">
+      <h2>{{ question.prompt }}</h2>
+      <div class="option-list" role="radiogroup" [attr.aria-label]="question.prompt">
+        <button
+          *ngFor="let option of question.options"
+          type="button"
+          class="option"
+          [class.selected]="answers.get(question.id) === option.id"
+          [attr.aria-pressed]="answers.get(question.id) === option.id"
+          (click)="choose(question.id, option.id)">
+          <span class="option-marker"></span>
+          <span>{{ option.label }}</span>
+        </button>
+      </div>
+    </article>
+
+    <div class="quiz-actions">
+      <button class="button button-ghost" type="button" [disabled]="currentIndex === 0" (click)="previous()">Back</button>
+      <button class="button button-primary" type="button" [disabled]="!canContinue || submitting" (click)="next()">
+        {{ currentIndex === questions.length - 1 ? (submitting ? 'Calculating…' : 'See my result') : 'Next question' }}
+      </button>
+    </div>
+  </ng-container>
+</section>

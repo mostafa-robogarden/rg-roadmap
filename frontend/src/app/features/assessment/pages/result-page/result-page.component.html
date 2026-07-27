@@ -1,1 +1,17 @@
-<p>result-page works!</p>
+<p *ngIf="loading" class="muted">Calculating your result…</p>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+
+<section *ngIf="assessment" class="result-card">
+  <p class="eyebrow">Assessment complete</p>
+  <h1>Your starting level is <span>{{ assessment.computedLevel }}</span>.</h1>
+  <p class="lead">{{ description(assessment.computedLevel) }}</p>
+  <div class="result-details card">
+    <div><span>Track</span><strong>{{ assessment.track.title }}</strong></div>
+    <div><span>Questions</span><strong>10 completed</strong></div>
+    <div><span>Generation</span><strong>Rule-based and curated</strong></div>
+  </div>
+  <div class="inline-actions">
+    <a class="button button-primary" [routerLink]="['/generated', assessment.id]">Build my roadmap</a>
+    <a class="button button-ghost" routerLink="/">Choose another track</a>
+  </div>
+</section>

@@ -1,1 +1,23 @@
-<p>track-details-page works!</p>
+<a routerLink="/">← Back to catalog</a>
+<p *ngIf="loading" class="muted">Loading track…</p>
+<div *ngIf="error" class="error-banner">{{ error }}</div>
+
+<section *ngIf="track" class="track-hero">
+  <div>
+    <span class="badge">{{ track.category }}</span>
+    <h1>{{ track.title }}</h1>
+    <p class="lead">{{ track.description }}</p>
+    <button class="button button-primary" type="button" [disabled]="starting" (click)="start()">
+      {{ starting ? 'Starting…' : 'Start the 10-question assessment' }}
+    </button>
+  </div>
+  <aside class="card">
+    <h2>What happens next?</h2>
+    <ol>
+      <li>Answer 10 questions about your current experience and goals.</li>
+      <li>Receive a Beginner, Tinkerer, or Competent starting level.</li>
+      <li>Review a step-by-step roadmap with milestones and resources.</li>
+      <li>Log in only when you are ready to save and track progress.</li>
+    </ol>
+  </aside>
+</section>

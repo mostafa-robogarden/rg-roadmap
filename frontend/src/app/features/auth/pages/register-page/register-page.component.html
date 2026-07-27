@@ -1,1 +1,27 @@
-<p>register-page works!</p>
+<section class="auth-layout">
+  <div class="auth-copy">
+    <p class="eyebrow">Save your progress</p>
+    <h1>Create an account when the roadmap feels right.</h1>
+    <p class="lead">The assessment and roadmap preview are open to guests. An account is only required to save and track milestones.</p>
+  </div>
+
+  <form class="card auth-form stack" [formGroup]="form" (ngSubmit)="submit()">
+    <h2>Create account</h2>
+    <div *ngIf="error" class="error-banner">{{ error }}</div>
+    <div class="form-field">
+      <label for="name">Name</label>
+      <input id="name" type="text" autocomplete="name" formControlName="name">
+    </div>
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" formControlName="email">
+    </div>
+    <div class="form-field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="new-password" formControlName="password">
+      <small class="muted">Use at least 8 characters.</small>
+    </div>
+    <button class="button button-primary" type="submit" [disabled]="submitting">{{ submitting ? 'Creating account…' : 'Create account' }}</button>
+    <p class="muted">Already registered? <a routerLink="/login" [queryParams]="{returnUrl: returnUrl}">Log in</a>.</p>
+  </form>
+</section>
