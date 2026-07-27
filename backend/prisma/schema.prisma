@@ -12,22 +12,196 @@ enum UserRole {
   ADMIN
 }
 
+enum SkillLevel {
+  BEGINNER
+  TINKERER
+  COMPETENT
+}
+
+enum AssessmentStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      UserRole @default(LEARNER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(LEARNER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assessments   Assessment[]
+  savedRoadmaps SavedRoadmap[]
+  events        AnalyticsEvent[]
 }
 
 model Track {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          String   @id @default(uuid())
   slug        String   @unique
+  title       String
+  category    String
   description String
   isTrending  Boolean  @default(false)
+  isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  questions     Question[]
+  assessments   Assessment[]
+  templates     RoadmapTemplate[]
+  savedRoadmaps SavedRoadmap[]
+}
+
+model Question {
+  id        String   @id @default(uuid())
+  trackId   String?
+  prompt    String
+  sortOrder Int
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  track   Track?             @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  options QuestionOption[]
+  answers AssessmentAnswer[]
+
+  @@index([trackId, sortOrder])
+}
+
+model QuestionOption {
+  id         String @id @default(uuid())
+  questionId String
+  label      String
+  value      String
+  score      Int
+  sortOrder  Int
+
+  question Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  AssessmentAnswer[]
+
+  @@unique([questionId, value])
+  @@index([questionId, sortOrder])
+}
+
+model Assessment {
+  id            String           @id @default(uuid())
+  userId        String?
+  sessionId     String
+  trackId       String
+  status        AssessmentStatus @default(IN_PROGRESS)
+  computedLevel SkillLevel?
+  startedAt     DateTime         @default(now())
+  completedAt   DateTime?
+
+  user         User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  track        Track              @relation(fields: [trackId], references: [id], onDelete: Restrict)
+  answers      AssessmentAnswer[]
+  savedRoadmap SavedRoadmap?
+
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model AssessmentAnswer {
+  id           String @id @default(uuid())
+  assessmentId String
+  questionId   String
+  optionId     String
+
+  assessment Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question   Question       @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  option     QuestionOption @relation(fields: [optionId], references: [id], onDelete: Restrict)
+
+  @@unique([assessmentId, questionId])
+}
+
+model RoadmapTemplate {
+  id          String     @id @default(uuid())
+  trackId     String
+  level       SkillLevel
+  title       String
+  description String
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  track      Track               @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  milestones TemplateMilestone[]
+
+  @@unique([trackId, level])
+}
+
+model TemplateMilestone {
+  id             String @id @default(uuid())
+  templateId     String
+  sortOrder      Int
+  title          String
+  description    String
+  estimatedHours Int?
+  resources      Json
+
+  template        RoadmapTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  savedMilestones SavedMilestone[]
+
+  @@unique([templateId, sortOrder])
+}
+
+model SavedRoadmap {
+  id           String     @id @default(uuid())
+  userId       String
+  assessmentId String     @unique
+  trackId      String
+  level        SkillLevel
+  title        String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Restrict)
+  track      Track            @relation(fields: [trackId], references: [id], onDelete: Restrict)
+  milestones SavedMilestone[]
+
+  @@index([userId, createdAt])
+}
+
+model SavedMilestone {
+  id                  String    @id @default(uuid())
+  savedRoadmapId      String
+  templateMilestoneId String?
+  sortOrder           Int
+  title               String
+  description         String
+  estimatedHours      Int?
+  resources           Json
+  completedAt         DateTime?
+
+  savedRoadmap      SavedRoadmap       @relation(fields: [savedRoadmapId], references: [id], onDelete: Cascade)
+  templateMilestone TemplateMilestone? @relation(fields: [templateMilestoneId], references: [id], onDelete: SetNull)
+
+  @@unique([savedRoadmapId, sortOrder])
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid())
+  userId     String?
+  sessionId  String
+  eventName  String
+  properties Json?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([eventName, createdAt])
+  @@index([sessionId])
+}
+
+model WebSession {
+  sid    String   @id @db.VarChar
+  sess   Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire])
+  @@map("session")
 }
