@@ -24,6 +24,22 @@ enum AssessmentStatus {
   COMPLETED
 }
 
+enum AiGenerationKind {
+  QUESTIONNAIRE
+  ROADMAP
+}
+
+enum RoadmapGenerationSource {
+  AI
+  RULE_BASED_FALLBACK
+}
+
+enum LessonProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -96,13 +112,22 @@ model Assessment {
   startedAt     DateTime         @default(now())
   completedAt   DateTime?
 
-  user         User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  track        Track              @relation(fields: [trackId], references: [id], onDelete: Restrict)
-  answers      AssessmentAnswer[]
-  savedRoadmap SavedRoadmap?
+  learnerGoal  String @default("")
+  weeklyHours  Int    @default(5)
+  targetMonths Int    @default(6)
+
+  user  User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Restrict)
+
+  answers            AssessmentAnswer[]
+  generatedQuestions AssessmentQuestion[]
+  generatedResponses AssessmentResponse[]
+  aiGenerations      AiGeneration[]
+  savedRoadmap       SavedRoadmap?
 
   @@index([sessionId])
   @@index([userId])
+  @@index([trackId, startedAt])
 }
 
 model AssessmentAnswer {
@@ -116,6 +141,71 @@ model AssessmentAnswer {
   option     QuestionOption @relation(fields: [optionId], references: [id], onDelete: Restrict)
 
   @@unique([assessmentId, questionId])
+  @@index([assessmentId])
+}
+
+model AssessmentQuestion {
+  id           String @id @default(uuid())
+  assessmentId String
+  prompt       String
+  topic        String
+  sortOrder    Int
+
+  assessment Assessment           @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  options    AssessmentOption[]
+  responses  AssessmentResponse[]
+
+  @@unique([assessmentId, sortOrder])
+  @@index([assessmentId])
+}
+
+model AssessmentOption {
+  id         String @id @default(uuid())
+  questionId String
+  label      String
+  score      Int
+  sortOrder  Int
+
+  question  AssessmentQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  responses AssessmentResponse[]
+
+  @@unique([questionId, sortOrder])
+  @@index([questionId])
+}
+
+model AssessmentResponse {
+  id           String @id @default(uuid())
+  assessmentId String
+  questionId   String
+  optionId     String
+
+  assessment Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  option     AssessmentOption   @relation(fields: [optionId], references: [id], onDelete: Restrict)
+
+  @@unique([assessmentId, questionId])
+  @@index([assessmentId])
+  @@index([questionId])
+  @@index([optionId])
+}
+
+model AiGeneration {
+  id            String           @id @default(uuid())
+  assessmentId  String
+  kind          AiGenerationKind
+  provider      String
+  model         String
+  promptVersion String
+  draftPayload  Json?
+  finalPayload  Json?
+  errorMessage  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, kind])
+  @@index([kind, createdAt])
 }
 
 model RoadmapTemplate {
@@ -150,14 +240,17 @@ model TemplateMilestone {
 }
 
 model SavedRoadmap {
-  id           String     @id @default(uuid())
+  id           String                  @id @default(uuid())
   userId       String
-  assessmentId String     @unique
+  assessmentId String                  @unique
   trackId      String
   level        SkillLevel
   title        String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  summary      String                  @default("")
+  source       RoadmapGenerationSource @default(RULE_BASED_FALLBACK)
+  roadmapJson  Json?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
 
   user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   assessment Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Restrict)
@@ -165,23 +258,42 @@ model SavedRoadmap {
   milestones SavedMilestone[]
 
   @@index([userId, createdAt])
+  @@index([trackId])
 }
 
 model SavedMilestone {
-  id                  String    @id @default(uuid())
+  id                  String  @id @default(uuid())
   savedRoadmapId      String
   templateMilestoneId String?
-  sortOrder           Int
-  title               String
-  description         String
-  estimatedHours      Int?
-  resources           Json
-  completedAt         DateTime?
 
-  savedRoadmap      SavedRoadmap       @relation(fields: [savedRoadmapId], references: [id], onDelete: Cascade)
+  sortOrder      Int
+  title          String
+  description    String
+  estimatedHours Int?
+  resources      Json
+
+  publicLessonId String?
+
+  moduleId          String  @default("legacy_module")
+  moduleName        String  @default("Roadmap")
+  moduleDescription String?
+  moduleOrder       Int     @default(1)
+  lessonOrder       Int     @default(1)
+
+  xpReward Int @default(0)
+
+  status LessonProgressStatus @default(NOT_STARTED)
+
+  children    Json?
+  completedAt DateTime?
+
+  savedRoadmap SavedRoadmap @relation(fields: [savedRoadmapId], references: [id], onDelete: Cascade)
+
   templateMilestone TemplateMilestone? @relation(fields: [templateMilestoneId], references: [id], onDelete: SetNull)
 
   @@unique([savedRoadmapId, sortOrder])
+  @@unique([savedRoadmapId, publicLessonId])
+  @@index([savedRoadmapId, moduleOrder, lessonOrder])
 }
 
 model AnalyticsEvent {

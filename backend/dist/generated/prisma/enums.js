@@ -20,3 +20,16 @@ export const AssessmentStatus = {
     IN_PROGRESS: 'IN_PROGRESS',
     COMPLETED: 'COMPLETED'
 };
+export const AiGenerationKind = {
+    QUESTIONNAIRE: 'QUESTIONNAIRE',
+    ROADMAP: 'ROADMAP'
+};
+export const RoadmapGenerationSource = {
+    AI: 'AI',
+    RULE_BASED_FALLBACK: 'RULE_BASED_FALLBACK'
+};
+export const LessonProgressStatus = {
+    NOT_STARTED: 'NOT_STARTED',
+    IN_PROGRESS: 'IN_PROGRESS',
+    COMPLETED: 'COMPLETED'
+};

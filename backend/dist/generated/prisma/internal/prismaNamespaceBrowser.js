@@ -45,6 +45,10 @@ export const ModelName = {
     QuestionOption: 'QuestionOption',
     Assessment: 'Assessment',
     AssessmentAnswer: 'AssessmentAnswer',
+    AssessmentQuestion: 'AssessmentQuestion',
+    AssessmentOption: 'AssessmentOption',
+    AssessmentResponse: 'AssessmentResponse',
+    AiGeneration: 'AiGeneration',
     RoadmapTemplate: 'RoadmapTemplate',
     TemplateMilestone: 'TemplateMilestone',
     SavedRoadmap: 'SavedRoadmap',
@@ -106,13 +110,49 @@ export const AssessmentScalarFieldEnum = {
     status: 'status',
     computedLevel: 'computedLevel',
     startedAt: 'startedAt',
-    completedAt: 'completedAt'
+    completedAt: 'completedAt',
+    learnerGoal: 'learnerGoal',
+    weeklyHours: 'weeklyHours',
+    targetMonths: 'targetMonths'
 };
 export const AssessmentAnswerScalarFieldEnum = {
     id: 'id',
     assessmentId: 'assessmentId',
     questionId: 'questionId',
     optionId: 'optionId'
+};
+export const AssessmentQuestionScalarFieldEnum = {
+    id: 'id',
+    assessmentId: 'assessmentId',
+    prompt: 'prompt',
+    topic: 'topic',
+    sortOrder: 'sortOrder'
+};
+export const AssessmentOptionScalarFieldEnum = {
+    id: 'id',
+    questionId: 'questionId',
+    label: 'label',
+    score: 'score',
+    sortOrder: 'sortOrder'
+};
+export const AssessmentResponseScalarFieldEnum = {
+    id: 'id',
+    assessmentId: 'assessmentId',
+    questionId: 'questionId',
+    optionId: 'optionId'
+};
+export const AiGenerationScalarFieldEnum = {
+    id: 'id',
+    assessmentId: 'assessmentId',
+    kind: 'kind',
+    provider: 'provider',
+    model: 'model',
+    promptVersion: 'promptVersion',
+    draftPayload: 'draftPayload',
+    finalPayload: 'finalPayload',
+    errorMessage: 'errorMessage',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 export const RoadmapTemplateScalarFieldEnum = {
     id: 'id',
@@ -140,6 +180,9 @@ export const SavedRoadmapScalarFieldEnum = {
     trackId: 'trackId',
     level: 'level',
     title: 'title',
+    summary: 'summary',
+    source: 'source',
+    roadmapJson: 'roadmapJson',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -152,6 +195,15 @@ export const SavedMilestoneScalarFieldEnum = {
     description: 'description',
     estimatedHours: 'estimatedHours',
     resources: 'resources',
+    publicLessonId: 'publicLessonId',
+    moduleId: 'moduleId',
+    moduleName: 'moduleName',
+    moduleDescription: 'moduleDescription',
+    moduleOrder: 'moduleOrder',
+    lessonOrder: 'lessonOrder',
+    xpReward: 'xpReward',
+    status: 'status',
+    children: 'children',
     completedAt: 'completedAt'
 };
 export const AnalyticsEventScalarFieldEnum = {
@@ -171,11 +223,11 @@ export const SortOrder = {
     asc: 'asc',
     desc: 'desc'
 };
-export const JsonNullValueInput = {
-    JsonNull: JsonNull
-};
 export const NullableJsonNullValueInput = {
     DbNull: DbNull,
+    JsonNull: JsonNull
+};
+export const JsonNullValueInput = {
     JsonNull: JsonNull
 };
 export const QueryMode = {

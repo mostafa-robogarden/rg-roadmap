@@ -14,7 +14,8 @@
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "test:smoke": "tsx src/scripts/smoke-test.ts"
+    "test:smoke": "tsx src/scripts/smoke-test.ts",
+    "test:ai": "tsx src/scripts/test-ai.ts"
   },
   "keywords": [],
   "type": "module",
