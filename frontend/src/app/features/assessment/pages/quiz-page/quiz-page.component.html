@@ -13,7 +13,16 @@
     <div class="progress-track"><div class="progress-fill" [style.width.%]="progress"></div></div>
 
     <article class="card question-card">
-      <h2>{{ question.prompt }}</h2>
+      <p
+        *ngIf="question.topic"
+        class="eyebrow"
+      >
+        {{ question.topic }}
+      </p>
+
+      <h2>
+        {{ question.prompt }}
+      </h2>
       <div class="option-list" role="radiogroup" [attr.aria-label]="question.prompt">
         <button
           *ngFor="let option of question.options"

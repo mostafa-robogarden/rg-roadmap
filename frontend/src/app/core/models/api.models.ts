@@ -1,5 +1,11 @@
-export type UserRole = 'LEARNER' | 'ADMIN';
-export type SkillLevel = 'BEGINNER' | 'TINKERER' | 'COMPETENT';
+export type UserRole =
+  | 'LEARNER'
+  | 'ADMIN';
+
+export type SkillLevel =
+  | 'BEGINNER'
+  | 'TINKERER'
+  | 'COMPETENT';
 
 export interface User {
   id: string;
@@ -22,7 +28,13 @@ export interface Track {
 export interface QuestionOption {
   id: string;
   label: string;
-  value: string;
+
+  /*
+   * Present on the original database question
+   * API but not required for AI questions.
+   */
+  value?: string;
+
   sortOrder: number;
   score?: number;
 }
@@ -31,6 +43,7 @@ export interface Question {
   id: string;
   trackId?: string | null;
   prompt: string;
+  topic?: string;
   sortOrder: number;
   isActive?: boolean;
   options: QuestionOption[];
@@ -39,12 +52,35 @@ export interface Question {
 
 export interface Assessment {
   id: string;
-  status: 'IN_PROGRESS' | 'COMPLETED';
-  computedLevel: SkillLevel | null;
+
+  status:
+    | 'IN_PROGRESS'
+    | 'COMPLETED';
+
+  computedLevel:
+    | SkillLevel
+    | null;
+
   track: Track;
+
+  learnerGoal: string;
+  weeklyHours: number;
+  targetMonths: number;
+
   startedAt: string;
   completedAt: string | null;
-  answers: Array<{questionId: string; optionId: string}>;
+
+  answers: Array<{
+    questionId: string;
+    optionId: string;
+  }>;
+}
+
+export interface StartAssessmentInput {
+  trackSlug: string;
+  learnerGoal: string;
+  weeklyHours: number;
+  targetMonths: number;
 }
 
 export interface ResourceLink {
@@ -113,5 +149,9 @@ export interface AnalyticsSummary {
 }
 
 export interface ApiErrorBody {
-  error?: {code?: string; message?: string; fields?: unknown};
+  error?: {
+    code?: string;
+    message?: string;
+    fields?: unknown;
+  };
 }

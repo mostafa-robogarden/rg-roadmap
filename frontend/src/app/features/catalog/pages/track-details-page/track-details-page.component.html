@@ -1,23 +1,186 @@
-<a routerLink="/">← Back to catalog</a>
-<p *ngIf="loading" class="muted">Loading track…</p>
-<div *ngIf="error" class="error-banner">{{ error }}</div>
+<a routerLink="/">
+  ← Back to catalog
+</a>
 
-<section *ngIf="track" class="track-hero">
-  <div>
-    <span class="badge">{{ track.category }}</span>
-    <h1>{{ track.title }}</h1>
-    <p class="lead">{{ track.description }}</p>
-    <button class="button button-primary" type="button" [disabled]="starting" (click)="start()">
-      {{ starting ? 'Starting…' : 'Start the 10-question assessment' }}
-    </button>
+<p
+  *ngIf="loading"
+  class="muted"
+>
+  Loading track…
+</p>
+
+<div
+  *ngIf="error"
+  class="error-banner"
+>
+  {{ error }}
+</div>
+
+<section
+  *ngIf="track"
+  class="track-hero"
+>
+  <div class="track-introduction">
+    <span class="badge">
+      {{ track.category }}
+    </span>
+
+    <h1>
+      {{ track.title }}
+    </h1>
+
+    <p class="lead">
+      {{ track.description }}
+    </p>
+
+    <p class="muted">
+      Tell us what you want to achieve.
+      The local AI will use this track and
+      your goals to create your ten-question
+      assessment.
+    </p>
   </div>
-  <aside class="card">
-    <h2>What happens next?</h2>
-    <ol>
-      <li>Answer 10 questions about your current experience and goals.</li>
-      <li>Receive a Beginner, Tinkerer, or Competent starting level.</li>
-      <li>Review a step-by-step roadmap with milestones and resources.</li>
-      <li>Log in only when you are ready to save and track progress.</li>
-    </ol>
-  </aside>
+
+  <form
+    class="card assessment-form"
+    [formGroup]="form"
+    (ngSubmit)="start()"
+  >
+    <div>
+      <p class="eyebrow">
+        Personalize the assessment
+      </p>
+
+      <h2>
+        What are you aiming for?
+      </h2>
+    </div>
+
+    <div class="form-field">
+      <label for="learnerGoal">
+        Learning or career goal
+      </label>
+
+      <textarea
+        id="learnerGoal"
+        formControlName="learnerGoal"
+        placeholder="For example: I want to become employable as a junior front-end developer."
+        rows="4"
+      ></textarea>
+
+      <small
+        class="field-error"
+        *ngIf="
+          form.controls.learnerGoal.touched &&
+          form.controls.learnerGoal.invalid
+        "
+      >
+        Enter at least five characters describing
+        your goal.
+      </small>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="weeklyHours">
+          Hours available per week
+        </label>
+
+        <input
+          id="weeklyHours"
+          type="number"
+          min="1"
+          max="40"
+          formControlName="weeklyHours"
+        />
+
+        <small
+          class="field-error"
+          *ngIf="
+            form.controls.weeklyHours.touched &&
+            form.controls.weeklyHours.invalid
+          "
+        >
+          Enter between 1 and 40 hours.
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label for="targetMonths">
+          Target timeline in months
+        </label>
+
+        <input
+          id="targetMonths"
+          type="number"
+          min="1"
+          max="36"
+          formControlName="targetMonths"
+        />
+
+        <small
+          class="field-error"
+          *ngIf="
+            form.controls.targetMonths.touched &&
+            form.controls.targetMonths.invalid
+          "
+        >
+          Enter between 1 and 36 months.
+        </small>
+      </div>
+    </div>
+
+    <button
+      class="button button-primary"
+      type="submit"
+      [disabled]="starting"
+    >
+      {{
+        starting
+          ? 'Generating your questions…'
+          : 'Generate my assessment'
+      }}
+    </button>
+
+    <p
+      *ngIf="starting"
+      class="generation-note"
+    >
+      Ollama is generating ten questions for
+      {{ track.title }}. The first request can
+      take longer while the model loads.
+    </p>
+  </form>
+</section>
+
+<section
+  *ngIf="track"
+  class="steps-section"
+>
+  <article class="card">
+    <strong>1</strong>
+    <h3>Choose your goal</h3>
+    <p>
+      Tell the system what you want to achieve
+      and how much time you have.
+    </p>
+  </article>
+
+  <article class="card">
+    <strong>2</strong>
+    <h3>Complete your questionnaire</h3>
+    <p>
+      Answer ten questions generated for your
+      selected career track.
+    </p>
+  </article>
+
+  <article class="card">
+    <strong>3</strong>
+    <h3>Receive your roadmap</h3>
+    <p>
+      Your answers will be used to build a
+      personalized sequence of modules and lessons.
+    </p>
+  </article>
 </section>

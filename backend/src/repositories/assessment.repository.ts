@@ -1,22 +1,74 @@
 import { prisma } from "../lib/prisma.js";
 
-export function findAssessmentWithContent(id: string) {
+export function findAssessmentWithContent(
+  id: string,
+) {
   return prisma.assessment.findUnique({
-    where: { id },
+    where: {
+      id,
+    },
+
     include: {
       track: true,
+
+      /*
+       * Retained for compatibility with the
+       * original database-driven questionnaire.
+       */
       answers: true,
+
+      /*
+       * Questionnaire generated specifically
+       * for this assessment.
+       */
+      generatedQuestions: {
+        include: {
+          options: {
+            orderBy: {
+              sortOrder: "asc",
+            },
+          },
+        },
+
+        orderBy: {
+          sortOrder: "asc",
+        },
+      },
+
+      generatedResponses: true,
+
+      aiGenerations: true,
     },
   });
 }
 
-export function listQuestionsForTrack(trackId: string) {
+export function listQuestionsForTrack(
+  trackId: string,
+) {
   return prisma.question.findMany({
     where: {
       isActive: true,
-      OR: [{ trackId }, { trackId: null }],
+
+      OR: [
+        {
+          trackId,
+        },
+        {
+          trackId: null,
+        },
+      ],
     },
-    include: { options: { orderBy: { sortOrder: "asc" } } },
-    orderBy: { sortOrder: "asc" },
+
+    include: {
+      options: {
+        orderBy: {
+          sortOrder: "asc",
+        },
+      },
+    },
+
+    orderBy: {
+      sortOrder: "asc",
+    },
   });
 }
