@@ -1,10 +1,135 @@
-.progress-card { margin-bottom: 1.2rem; }
-.progress-card > div:first-child { display: flex; justify-content: space-between; margin-bottom: .75rem; }
-.milestone-list { display: grid; gap: 1rem; }
-.milestone { display: grid; grid-template-columns: 48px 1fr; gap: 1rem; transition: opacity .15s ease; }
-.milestone.complete { opacity: .68; background: #f0f8f5; }
-.milestone.complete h2 { text-decoration: line-through; }
-.check-button { width: 42px; height: 42px; border: 2px solid var(--primary); border-radius: 50%; background: white; color: var(--primary); font-weight: 850; cursor: pointer; }
-.complete .check-button { background: var(--primary); color: white; }
-.milestone-heading { display: flex; justify-content: space-between; gap: 1rem; }
-.resource-list { display: flex; flex-wrap: wrap; gap: .75rem; }
+.progress-card {
+  margin-bottom: 1.2rem;
+}
+
+.progress-card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.view-switch {
+  display: inline-flex;
+  gap: 0.35rem;
+
+  margin-bottom: 1.5rem;
+  padding: 0.3rem;
+
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.view-switch button {
+  padding: 0.6rem 0.9rem;
+
+  color: var(--muted);
+  background: transparent;
+
+  border: 0;
+  border-radius: 9px;
+
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.view-switch button.active {
+  color: #ffffff;
+  background: var(--primary);
+}
+
+.milestone-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.milestone {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 1rem;
+
+  border-left:
+    5px solid #64748b;
+
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.milestone.in-progress {
+  background: #fff8e8;
+  border-left-color: #d97706;
+}
+
+.milestone.complete {
+  background: #edf9f4;
+  border-left-color: #16855b;
+}
+
+.milestone.skipped {
+  background: #f5f0ff;
+  border-left-color: #7c3aed;
+}
+
+.milestone.complete h2 {
+  text-decoration: line-through;
+}
+
+.check-button {
+  width: 42px;
+  height: 42px;
+
+  color: var(--primary);
+  background: #ffffff;
+
+  border:
+    2px solid var(--primary);
+  border-radius: 50%;
+
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.complete .check-button {
+  color: #ffffff;
+  background: #16855b;
+  border-color: #16855b;
+}
+
+.in-progress .check-button {
+  color: #ffffff;
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.skipped .check-button {
+  color: #7c3aed;
+  border-color: #7c3aed;
+}
+
+.milestone-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.status-text {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.resource-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  margin-bottom: 1rem;
+}
+
+.resource-list a {
+  font-weight: 700;
+}

@@ -1,41 +1,227 @@
-<a routerLink="/">← Back to dashboard</a>
-<p *ngIf="loading" class="muted">Loading saved roadmap…</p>
-<div *ngIf="error" class="error-banner">{{ error }}</div>
+<a routerLink="/">
+  ← Back to dashboard
+</a>
 
-<section *ngIf="roadmap" class="saved-page">
+<p
+  *ngIf="loading"
+  class="muted"
+>
+  Loading saved roadmap…
+</p>
+
+<div
+  *ngIf="error"
+  class="error-banner"
+>
+  {{ error }}
+</div>
+
+<section
+  *ngIf="roadmap"
+  class="saved-page"
+>
   <div class="page-header">
     <div>
-      <p class="eyebrow">{{ roadmap.track.title }} · {{ roadmap.level }}</p>
-      <h1>{{ roadmap.title }}</h1>
-      <p class="lead">Mark milestones complete as you work through the path.</p>
+      <p class="eyebrow">
+        {{ roadmap.track.title }}
+        ·
+        {{ roadmap.level }}
+      </p>
+
+      <h1>
+        {{ roadmap.title }}
+      </h1>
+
+      <p class="lead">
+        {{
+          roadmap.summary ||
+          'Select a roadmap node to inspect it and update your progress.'
+        }}
+      </p>
     </div>
-    <button class="button button-danger" type="button" (click)="remove()">Delete roadmap</button>
+
+    <button
+      class="button button-danger"
+      type="button"
+      (click)="remove()"
+    >
+      Delete roadmap
+    </button>
   </div>
 
   <div class="progress-card card">
-    <div><strong>{{ progress }}% complete</strong><span>{{ roadmap.milestones.length }} milestones</span></div>
-    <div class="progress-track"><div class="progress-fill" [style.width.%]="progress"></div></div>
+    <div>
+      <strong>
+        {{ progress }}% complete
+      </strong>
+
+      <span>
+        {{ roadmap.milestones.length }}
+        steps
+      </span>
+    </div>
+
+    <div class="progress-track">
+      <div
+        class="progress-fill"
+        [style.width.%]="progress"
+      ></div>
+    </div>
   </div>
 
-  <div class="milestone-list">
-    <article *ngFor="let milestone of roadmap.milestones" class="card milestone" [class.complete]="milestone.completedAt">
+  <div class="view-switch">
+    <button
+      type="button"
+      [class.active]="
+        viewMode === 'graph'
+      "
+      (click)="setView('graph')"
+    >
+      Graph view
+    </button>
+
+    <button
+      type="button"
+      [class.active]="
+        viewMode === 'list'
+      "
+      (click)="setView('list')"
+    >
+      List view
+    </button>
+  </div>
+
+  <app-roadmap-graph
+    *ngIf="
+      viewMode === 'graph'
+    "
+    [modules]="graphModules"
+    [editable]="true"
+    [updatingIds]="updating"
+    (statusChange)="
+      onGraphStatusChange($event)
+    "
+  ></app-roadmap-graph>
+
+  <div
+    *ngIf="
+      viewMode === 'list'
+    "
+    class="milestone-list"
+  >
+    <article
+      *ngFor="
+        let milestone of
+          roadmap.milestones
+      "
+      class="card milestone"
+      [class.complete]="
+        milestone.status ===
+          'COMPLETED' ||
+        milestone.completedAt
+      "
+      [class.in-progress]="
+        milestone.status ===
+        'IN_PROGRESS'
+      "
+      [class.skipped]="
+        milestone.status ===
+        'SKIPPED'
+      "
+    >
       <button
         class="check-button"
         type="button"
-        [disabled]="updating.has(milestone.id)"
-        [attr.aria-label]="milestone.completedAt ? 'Mark milestone incomplete' : 'Mark milestone complete'"
-        (click)="toggle(milestone)">
-        {{ milestone.completedAt ? '✓' : milestone.sortOrder }}
+        [disabled]="
+          updating.has(
+            milestone.id
+          )
+        "
+        [attr.aria-label]="
+          milestone.status ===
+            'COMPLETED'
+            ? 'Reopen step'
+            : 'Mark step completed'
+        "
+        (click)="toggle(milestone)"
+      >
+        {{
+          milestone.status ===
+            'COMPLETED' ||
+          milestone.completedAt
+            ? '✓'
+            : milestone.sortOrder
+        }}
       </button>
+
       <div>
         <div class="milestone-heading">
-          <h2>{{ milestone.title }}</h2>
-          <span *ngIf="milestone.estimatedHours" class="badge">~{{ milestone.estimatedHours }} hours</span>
+          <div>
+            <span class="status-text">
+              {{
+                statusLabel(
+                  milestone
+                )
+              }}
+            </span>
+
+            <h2>
+              {{ milestone.title }}
+            </h2>
+          </div>
+
+          <span
+            *ngIf="
+              milestone.estimatedHours
+            "
+            class="badge"
+          >
+            ~{{ milestone.estimatedHours }}
+            hours
+          </span>
         </div>
-        <p>{{ milestone.description }}</p>
+
+        <p>
+          {{ milestone.description }}
+        </p>
+
         <div class="resource-list">
-          <a *ngFor="let resource of milestone.resources" [href]="resource.url" target="_blank" rel="noopener">{{ resource.label }} ↗</a>
+          <a
+            *ngFor="
+              let resource of
+                milestone.resources
+            "
+            [href]="resource.url"
+            target="_blank"
+            rel="noopener"
+          >
+            {{
+              resource.label ??
+              resource.title ??
+              'Open guide'
+            }}
+            ↗
+          </a>
         </div>
+
+        <button
+          *ngIf="
+            milestone.status ===
+              'NOT_STARTED' ||
+            milestone.status ===
+              'SKIPPED'
+          "
+          class="button button-secondary button-small"
+          type="button"
+          [disabled]="
+            updating.has(
+              milestone.id
+            )
+          "
+          (click)="start(milestone)"
+        >
+          Start this step
+        </button>
       </div>
     </article>
   </div>

@@ -1,0 +1,309 @@
+<div class="graph-layout">
+  <section
+    class="graph-panel"
+    aria-label="Interactive learning roadmap"
+  >
+    <div class="graph-legend">
+      <span class="legend-item not-started">
+        <span></span>
+        Not started
+      </span>
+
+      <span class="legend-item in-progress">
+        <span></span>
+        In progress
+      </span>
+
+      <span class="legend-item completed">
+        <span></span>
+        Completed
+      </span>
+
+      <span class="legend-item skipped">
+        <span></span>
+        Skipped
+      </span>
+    </div>
+
+    <div class="module-graph">
+      <section
+        *ngFor="
+          let module of modules;
+          let moduleIndex = index
+        "
+        class="graph-module"
+      >
+        <div class="module-heading">
+          <span class="module-number">
+            Module {{ moduleIndex + 1 }}
+          </span>
+
+          <h2>
+            {{ module.name }}
+          </h2>
+
+          <p *ngIf="module.description">
+            {{ module.description }}
+          </p>
+        </div>
+
+        <div class="lesson-path">
+          <div
+            *ngFor="
+              let lesson of module.lessons;
+              let lessonIndex = index
+            "
+            class="lesson-row"
+            [class.status-not-started]="
+              lesson.status ===
+              'NOT_STARTED'
+            "
+            [class.status-in-progress]="
+              lesson.status ===
+              'IN_PROGRESS'
+            "
+            [class.status-completed]="
+              lesson.status ===
+              'COMPLETED'
+            "
+            [class.status-skipped]="
+              lesson.status ===
+              'SKIPPED'
+            "
+          >
+            <button
+              class="roadmap-node"
+              type="button"
+              [class.selected]="
+                selectedLesson?.lessonId ===
+                lesson.lessonId
+              "
+              [attr.aria-label]="
+                'Open details for ' +
+                lesson.name
+              "
+              (click)="select(lesson)"
+            >
+              <span class="node-circle">
+                <span
+                  *ngIf="
+                    lesson.status !==
+                    'COMPLETED'
+                  "
+                >
+                  {{
+                    lessonNumber(
+                      moduleIndex,
+                      lessonIndex
+                    )
+                  }}
+                </span>
+
+                <span
+                  *ngIf="
+                    lesson.status ===
+                    'COMPLETED'
+                  "
+                >
+                  ✓
+                </span>
+              </span>
+
+              <span class="node-copy">
+                <strong>
+                  {{ lesson.name }}
+                </strong>
+
+                <span>
+                  {{
+                    statusLabel(
+                      lesson.status
+                    )
+                  }}
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <aside
+    class="details-panel"
+    *ngIf="selectedLesson as lesson"
+  >
+    <span
+      class="status-badge"
+      [class.status-not-started]="
+        lesson.status ===
+        'NOT_STARTED'
+      "
+      [class.status-in-progress]="
+        lesson.status ===
+        'IN_PROGRESS'
+      "
+      [class.status-completed]="
+        lesson.status ===
+        'COMPLETED'
+      "
+      [class.status-skipped]="
+        lesson.status ===
+        'SKIPPED'
+      "
+    >
+      {{
+        statusLabel(
+          lesson.status
+        )
+      }}
+    </span>
+
+    <h2>
+      {{ lesson.name }}
+    </h2>
+
+    <p>
+      {{ lesson.description }}
+    </p>
+
+    <dl class="lesson-metadata">
+      <div
+        *ngIf="
+          lesson.estimatedHours
+        "
+      >
+        <dt>
+          Estimated effort
+        </dt>
+
+        <dd>
+          ~{{ lesson.estimatedHours }}
+          hours
+        </dd>
+      </div>
+
+      <div>
+        <dt>
+          XP reward
+        </dt>
+
+        <dd>
+          {{ lesson.xpReward }} XP
+        </dd>
+      </div>
+    </dl>
+
+    <section
+      class="resource-section"
+      *ngIf="
+        lesson.resources.length
+      "
+    >
+      <h3>
+        Guides and resources
+      </h3>
+
+      <a
+        *ngFor="
+          let resource of
+            lesson.resources
+        "
+        class="resource-link"
+        [href]="resource.url"
+        target="_blank"
+        rel="noopener"
+      >
+        {{
+          resourceName(
+            resource
+          )
+        }}
+        ↗
+      </a>
+    </section>
+
+    <p
+      *ngIf="
+        !lesson.resources.length
+      "
+      class="muted"
+    >
+      No guide links have been added
+      to this step yet.
+    </p>
+
+    <div
+      class="progress-actions"
+      *ngIf="editable; else readOnlyProgress"
+    >
+      <button
+        *ngIf="
+          lesson.status ===
+            'NOT_STARTED' ||
+          lesson.status ===
+            'SKIPPED'
+        "
+        class="button button-primary"
+        type="button"
+        [disabled]="
+          isUpdating(lesson)
+        "
+        (click)="start(lesson)"
+      >
+        Start this step
+      </button>
+
+      <button
+        *ngIf="
+          lesson.status !==
+          'COMPLETED'
+        "
+        class="button button-secondary"
+        type="button"
+        [disabled]="
+          isUpdating(lesson)
+        "
+        (click)="complete(lesson)"
+      >
+        Mark completed
+      </button>
+
+      <button
+        *ngIf="
+          lesson.status ===
+          'COMPLETED'
+        "
+        class="button button-secondary"
+        type="button"
+        [disabled]="
+          isUpdating(lesson)
+        "
+        (click)="start(lesson)"
+      >
+        Reopen step
+      </button>
+
+      <button
+        *ngIf="
+          lesson.status !==
+          'NOT_STARTED'
+        "
+        class="button button-ghost"
+        type="button"
+        [disabled]="
+          isUpdating(lesson)
+        "
+        (click)="reset(lesson)"
+      >
+        Reset
+      </button>
+    </div>
+
+    <ng-template #readOnlyProgress>
+      <p class="readonly-message">
+        {{ readonlyMessage }}
+      </p>
+    </ng-template>
+  </aside>
+</div>

@@ -1,31 +1,170 @@
-<p *ngIf="loading" class="muted">Generating your roadmap…</p>
-<div *ngIf="error" class="error-banner">{{ error }}</div>
+<p
+  *ngIf="loading"
+  class="muted"
+>
+  Generating your roadmap…
+</p>
 
-<section *ngIf="roadmap" class="roadmap-page">
+<div
+  *ngIf="error"
+  class="error-banner"
+>
+  {{ error }}
+</div>
+
+<section
+  *ngIf="roadmap"
+  class="roadmap-page"
+>
   <div class="page-header">
     <div>
-      <p class="eyebrow">{{ roadmap.track.title }} · {{ roadmap.level }}</p>
-      <h1>{{ roadmap.title }}</h1>
-      <p class="lead">{{ roadmap.description }}</p>
+      <p class="eyebrow">
+        {{ roadmap.track.title }}
+        ·
+        {{ roadmap.level }}
+      </p>
+
+      <h1>
+        {{ roadmap.title }}
+      </h1>
+
+      <p class="lead">
+        {{ roadmapSummary }}
+      </p>
     </div>
-    <button class="button button-primary" type="button" [disabled]="saving" (click)="save()">
-      {{ saving ? 'Saving…' : (auth.isAuthenticated ? 'Save roadmap' : 'Log in to save') }}
+
+    <button
+      class="button button-primary"
+      type="button"
+      [disabled]="saving"
+      (click)="save()"
+    >
+      {{
+        saving
+          ? 'Saving…'
+          : (
+              auth.isAuthenticated
+                ? 'Save roadmap'
+                : 'Log in to save'
+            )
+      }}
     </button>
   </div>
 
-  <div class="roadmap-line">
-    <article *ngFor="let milestone of roadmap.milestones; let index = index" class="milestone card">
-      <div class="milestone-number">{{ index + 1 }}</div>
-      <div>
-        <div class="milestone-heading">
-          <h2>{{ milestone.title }}</h2>
-          <span *ngIf="milestone.estimatedHours" class="badge">~{{ milestone.estimatedHours }} hours</span>
+  <div class="view-switch">
+    <button
+      type="button"
+      [class.active]="
+        viewMode === 'graph'
+      "
+      (click)="setView('graph')"
+    >
+      Graph view
+    </button>
+
+    <button
+      type="button"
+      [class.active]="
+        viewMode === 'list'
+      "
+      (click)="setView('list')"
+    >
+      List view
+    </button>
+  </div>
+
+  <app-roadmap-graph
+    *ngIf="
+      viewMode === 'graph'
+    "
+    [modules]="graphModules"
+    [editable]="false"
+    readonlyMessage="Save this roadmap to start changing lesson progress."
+  ></app-roadmap-graph>
+
+  <div
+    *ngIf="
+      viewMode === 'list'
+    "
+    class="module-list"
+  >
+    <section
+      *ngFor="
+        let module of graphModules;
+        let moduleIndex = index
+      "
+      class="module-card card"
+    >
+      <p class="eyebrow">
+        Module {{ moduleIndex + 1 }}
+      </p>
+
+      <h2>
+        {{ module.name }}
+      </h2>
+
+      <p
+        *ngIf="
+          module.description
+        "
+        class="muted"
+      >
+        {{ module.description }}
+      </p>
+
+      <article
+        *ngFor="
+          let lesson of
+            module.lessons;
+          let lessonIndex = index
+        "
+        class="list-lesson"
+      >
+        <span class="lesson-number">
+          {{ lessonIndex + 1 }}
+        </span>
+
+        <div>
+          <div class="lesson-heading">
+            <h3>
+              {{ lesson.name }}
+            </h3>
+
+            <span
+              *ngIf="
+                lesson.estimatedHours
+              "
+              class="badge"
+            >
+              ~{{ lesson.estimatedHours }}
+              hours
+            </span>
+          </div>
+
+          <p>
+            {{ lesson.description }}
+          </p>
+
+          <div class="resource-list">
+            <a
+              *ngFor="
+                let resource of
+                  lesson.resources
+              "
+              [href]="resource.url"
+              target="_blank"
+              rel="noopener"
+            >
+              {{
+                resource.label ??
+                resource.title ??
+                'Open guide'
+              }}
+              ↗
+            </a>
+          </div>
         </div>
-        <p>{{ milestone.description }}</p>
-        <div class="resource-list" *ngIf="milestone.resources.length">
-          <a *ngFor="let resource of milestone.resources" [href]="resource.url" target="_blank" rel="noopener">{{ resource.label }} ↗</a>
-        </div>
-      </div>
-    </article>
+      </article>
+    </section>
   </div>
 </section>

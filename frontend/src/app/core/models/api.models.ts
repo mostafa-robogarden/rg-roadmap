@@ -7,6 +7,11 @@ export type SkillLevel =
   | 'TINKERER'
   | 'COMPETENT';
 
+export type LessonProgressStatus =
+  | 'NOT_STARTED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'SKIPPED';
 export interface User {
   id: string;
   name: string;
@@ -84,29 +89,78 @@ export interface StartAssessmentInput {
 }
 
 export interface ResourceLink {
-  label: string;
+  resourceId?: string;
+  label?: string;
+  title?: string;
   url: string;
 }
 
 export interface RoadmapMilestone {
+  /*
+   * PostgreSQL SavedMilestone ID.
+   */
   id: string;
+
   sortOrder: number;
   title: string;
   description: string;
   estimatedHours: number | null;
   resources: ResourceLink[];
+
+  publicLessonId?: string | null;
+
+  moduleId?: string;
+  moduleName?: string;
+  moduleDescription?: string | null;
+  moduleOrder?: number;
+  lessonOrder?: number;
+
+  xpReward?: number;
+
+  status?: LessonProgressStatus;
+
+  children?: string[] | null;
+
   completedAt?: string | null;
 }
 
 export interface GeneratedRoadmap {
-  templateId: string;
+  templateId?: string;
   track: Track;
   level: SkillLevel;
   title: string;
-  description: string;
-  milestones: RoadmapMilestone[];
-}
 
+  /*
+   * Rule-based versions may return description.
+   * AI versions may return summary.
+   */
+  description?: string;
+  summary?: string;
+
+  modules?: GeneratedRoadmapModule[];
+
+  /*
+   * Retained temporarily for older rule-based
+   * responses.
+   */
+  milestones?: RoadmapMilestone[];
+}
+export interface GeneratedRoadmapModule {
+  moduleId: string;
+  name: string;
+  description?: string;
+  lessons: GeneratedRoadmapLesson[];
+}
+export interface GeneratedRoadmapLesson {
+  lessonId: string;
+  name: string;
+  description?: string;
+  estimatedHours?: number;
+  xpReward?: number;
+  status?: LessonProgressStatus;
+  children?: string[];
+  resources: ResourceLink[];
+}
 export interface SavedRoadmapSummary {
   id: string;
   title: string;
@@ -120,7 +174,9 @@ export interface SavedRoadmapSummary {
 export interface SavedRoadmap {
   id: string;
   title: string;
+  summary?: string;
   level: SkillLevel;
+  source?: 'AI' | 'RULE_BASED_FALLBACK';
   track: Track;
   createdAt: string;
   milestones: RoadmapMilestone[];
@@ -135,6 +191,29 @@ export interface RoadmapTemplate {
   isActive: boolean;
   track: Track;
   milestones: RoadmapMilestone[];
+}
+export interface RoadmapGraphLesson {
+  /*
+   * Database ID is present for saved roadmaps.
+   * Generated previews do not have one yet.
+   */
+  databaseId?: string;
+
+  lessonId: string;
+  name: string;
+  description: string;
+  estimatedHours: number | null;
+  xpReward: number;
+  status: LessonProgressStatus;
+  children: string[];
+  resources: ResourceLink[];
+}
+
+export interface RoadmapGraphModule {
+  moduleId: string;
+  name: string;
+  description?: string;
+  lessons: RoadmapGraphLesson[];
 }
 
 export interface AnalyticsSummary {

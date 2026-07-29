@@ -38,6 +38,7 @@ enum LessonProgressStatus {
   NOT_STARTED
   IN_PROGRESS
   COMPLETED
+  SKIPPED
 }
 
 model User {
